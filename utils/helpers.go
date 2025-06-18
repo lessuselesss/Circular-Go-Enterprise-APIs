@@ -206,100 +206,100 @@ func bytesToHex(b []byte) string {
 	return hex.EncodeToString(b)
 }
 
-func VerifySignature(publicKey string, message string, signature string) bool {
-	if len(publicKey) != 130 {
-		fmt.Println("Invalid public key length")
-		return false
-	}
+// func VerifySignature(publicKey string, message string, signature string) bool {
+// 	if len(publicKey) != 130 {
+// 		fmt.Println("Invalid public key length")
+// 		return false
+// 	}
 
-	// Remove the 0x prefix from the public key
-	remove0x := HexFix(publicKey)
+// 	// Remove the 0x prefix from the public key
+// 	remove0x := HexFix(publicKey)
 
-	// Hash the message to verify with SHA256
-	msgHash := sha256.Sum256([]byte(message))
+// 	// Hash the message to verify with SHA256
+// 	msgHash := sha256.Sum256([]byte(message))
 
-	// Decode the public key from hex
-	publicKeyBytes, err := hex.DecodeString(remove0x)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
+// 	// Decode the public key from hex
+// 	publicKeyBytes, err := hex.DecodeString(remove0x)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return false
+// 	}
 
-	// Parse the public key
-	pubKey, err := secp256k1.ParsePubKey(publicKeyBytes)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
+// 	// Parse the public key
+// 	pubKey, err := secp256k1.ParsePubKey(publicKeyBytes)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return false
+// 	}
 
-	// Convert btcec.PublicKey to ecdsa.PublicKey
-	ecdsaPubKey := ecdsa.PublicKey{
-		Curve: secp256k1.S256(),
-		X:     pubKey.X(),
-		Y:     pubKey.Y(),
-	}
+// 	// Convert btcec.PublicKey to ecdsa.PublicKey
+// 	ecdsaPubKey := ecdsa.PublicKey{
+// 		Curve: secp256k1.S256(),
+// 		X:     pubKey.X(),
+// 		Y:     pubKey.Y(),
+// 	}
 
-	// Decode the signature from hex
-	signatureBytes, err := hex.DecodeString(signature)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
+// 	// Decode the signature from hex
+// 	signatureBytes, err := hex.DecodeString(signature)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return false
+// 	}
 
-	// Parse the signature from DER format
-	var ecsig ECDSASignature
-	_, err = asn1.Unmarshal(signatureBytes, &ecsig)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
+// 	// Parse the signature from DER format
+// 	var ecsig ECDSASignature
+// 	_, err = asn1.Unmarshal(signatureBytes, &ecsig)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return false
+// 	}
 
-	// Verify the signature
-	return ecdsa.Verify(&ecdsaPubKey, msgHash[:], ecsig.R, ecsig.S)
-}
+// 	// Verify the signature
+// 	return ecdsa.Verify(&ecdsaPubKey, msgHash[:], ecsig.R, ecsig.S)
+// }
 
-func GetPublicKey(privateKey string) string {
-	privKeyBytes, err := hex.DecodeString(privateKey)
-	if err != nil {
-		return ""
-	}
+// func GetPublicKey(privateKey string) string {
+// 	privKeyBytes, err := hex.DecodeString(privateKey)
+// 	if err != nil {
+// 		return ""
+// 	}
 
-	privKey := secp256k1.PrivKeyFromBytes(privKeyBytes)
-	pubKey := privKey.PubKey()
+// 	privKey := secp256k1.PrivKeyFromBytes(privKeyBytes)
+// 	pubKey := privKey.PubKey()
 
-	return hex.EncodeToString(pubKey.SerializeUncompressed())
-}
+// 	return hex.EncodeToString(pubKey.SerializeUncompressed())
+// }
 
-func GetKeysFromString(seedPhrase string) (map[string]string, error) {
-	// Generate private key using RFC 6979
-	hashHex := Sha256(seedPhrase)
-	hash, err := hex.DecodeString(hashHex)
-	if err != nil {
-		return nil, err
-	}
+// func GetKeysFromString(seedPhrase string) (map[string]string, error) {
+// 	// Generate private key using RFC 6979
+// 	hashHex := Sha256(seedPhrase)
+// 	hash, err := hex.DecodeString(hashHex)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	privateKey := secp256k1.PrivKeyFromBytes(hash)
-	publicKey := privateKey.PubKey()
+// 	privateKey := secp256k1.PrivKeyFromBytes(hash)
+// 	publicKey := privateKey.PubKey()
 
-	// Encode private key in DER format
-	privateKeyDER := privateKey.Serialize()
+// 	// Encode private key in DER format
+// 	privateKeyDER := privateKey.Serialize()
 
-	// Encode public key in DER format
-	publicKeyDER := publicKey.SerializeUncompressed()
+// 	// Encode public key in DER format
+// 	publicKeyDER := publicKey.SerializeUncompressed()
 
-	// Generate address from public key
-	addressDER := Sha256(bytesToHex(publicKey.SerializeUncompressed()))
+// 	// Generate address from public key
+// 	addressDER := Sha256(bytesToHex(publicKey.SerializeUncompressed()))
 
-	// Create a map to hold the results
-	result := map[string]string{
-		"privateKey": bytesToHex(privateKeyDER),
-		"publicKey":  bytesToHex(publicKeyDER),
-		"address":    addressDER,
-		"seedPhrase": seedPhrase,
-	}
+// 	// Create a map to hold the results
+// 	result := map[string]string{
+// 		"privateKey": bytesToHex(privateKeyDER),
+// 		"publicKey":  bytesToHex(publicKeyDER),
+// 		"address":    addressDER,
+// 		"seedPhrase": seedPhrase,
+// 	}
 
-	return result, nil
-}
+// 	return result, nil
+// }
 
 // NAG FUNCTIONS
 
