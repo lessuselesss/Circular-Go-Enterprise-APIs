@@ -1,4 +1,4 @@
-package circular_protocol_api
+package circular_protocol_enterprise_api
 
 import (
 	"bytes"
