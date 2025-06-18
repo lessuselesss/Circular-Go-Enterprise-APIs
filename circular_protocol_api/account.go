@@ -14,6 +14,22 @@ import (
 	"github.com/btcsuite/btcd/btcec/v2/schnorr"
 )
 
+
+type CEPAccount struct {
+	Address      string
+	PublicKey    string
+	Info         string
+	CodeVersion  string
+	LastError    string
+	NAGURL       string
+	NetworkNode  string
+	Blockchain   string
+	LatestTxID   string
+	Nonce        int
+	Data         map[string]interface{}
+	IntervalSec  int
+}
+
 // SubmitResponse is the expected response structure after submitting a certificate.
 type SubmitResponse struct {
 	Result   int    `json:"result"`
