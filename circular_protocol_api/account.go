@@ -317,41 +317,6 @@ func (a *CEPAccount) GetTransactionOutcome(txID string, timeoutSec int) (map[str
 	}
 }
 
-// Helper functions corresponding to the Node.js implementation.
-
-func padNumber(num int) string {
-	if num < 10 {
-		return "0" + strconv.Itoa(num)
-	}
-	return strconv.Itoa(num)
-}
-
-func getFormattedTimestamp() string {
-	date := time.Now().UTC()
-	return fmt.Sprintf("%d:%s:%s-%s:%s:%s",
-		date.Year(),
-		padNumber(int(date.Month())),
-		padNumber(date.Day()),
-		padNumber(date.Hour()),
-		padNumber(date.Minute()),
-		padNumber(date.Second()))
-}
-
-func hexFix(word string) string {
-	return strings.TrimPrefix(word, "0x")
-}
-
-func stringToHex(s string) string {
-	return hex.EncodeToString([]byte(s))
-}
-
-func hexToString(s string) (string, error) {
-	b, err := hex.DecodeString(hexFix(s))
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
-}
 
 // // SubmitResponse is the expected response structure after submitting a certificate.
 // type SubmitResponse struct {
