@@ -5,16 +5,17 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/btcsuite/btcd/btcec/v2/schnorr"
+	"github.com/btcsuite/btcd/btcec"
 )
-
-package circular
 
 import (
 	"bytes"
@@ -28,7 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/btcsuite/btcd/btcec"
 )
 
 const (
