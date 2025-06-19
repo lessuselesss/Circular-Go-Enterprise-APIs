@@ -1,4 +1,4 @@
-package circular_protocol_ehterprise_api
+package circular_protocol_enterprise_api
 
 func init() {
 	// Code initialization

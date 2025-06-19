@@ -9,30 +9,16 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
+	// "strings" // Removed as unused
 	"time"
+	"crypto/ecdsa"
+	"crypto/rand"
 
 	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/btcsuite/btcd/btcec/v2/schnorr"
-	"github.com/btcsuite/btcd/btcec"
-)
-
-import (
-	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
-
+	// "github.com/btcsuite/btcd/btcec/v2/schnorr" // Removed as unused
 )
 
 const (
-	libVersion   = "1.0.1"
 	networkURL   = "https://circularlabs.io/network/getNAG?network="
 	defaultChain = "0x8a20baa40c45dc5055aeb26197c203e576ef389d9acb171bd62da11dc5ad72b2"
 	defaultNAG   = "https://nag.circularlabs.io/NAG.php?cep="
@@ -175,23 +161,25 @@ func (a *CEPAccount) SignData(data, privateKey string) (string, error) {
 		return "", errors.New("account is not open")
 	}
 
-	privKeyBytes, err := hex.DecodeString(hexFix(privateKey))
+	// Use decodeHex from utils.go which handles "0x" prefix
+	privKeyBytes, err := decodeHex(privateKey)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to decode private key: %w", err)
 	}
 
-	privKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBytes)
+	privKey, _ := btcec.PrivKeyFromBytes(privKeyBytes)
 
 	hasher := sha256.New()
 	hasher.Write([]byte(data))
 	msgHash := hasher.Sum(nil)
 
-	signature, err := privKey.Sign(msgHash)
+	// Use ecdsa.SignASN1 with the private key
+	signatureBytes, err := ecdsa.SignASN1(rand.Reader, privKey.ToECDSA(), msgHash)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to sign data: %w", err)
 	}
 
-	return hex.EncodeToString(signature.Serialize()), nil
+	return hex.EncodeToString(signatureBytes), nil
 }
 
 // GetTransactionByID retrieves a transaction by its ID within a block range.
