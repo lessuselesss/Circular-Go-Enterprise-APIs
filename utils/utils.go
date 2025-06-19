@@ -24,7 +24,7 @@ import (
 	"github.com/decred/dcrd/dcrec/secp256k1/v4"
 )
 
-/* SendRequest sends an HTTP POST request with JSON data
+/* sendRequest sends an HTTP POST request with JSON data
 * @param data interface{} - data to send
 * @param nagFunction string - function to call
 * @param nagURL string - URL to call
@@ -32,7 +32,7 @@ import (
 * @return error - error
  */
 // SendRequest performs an HTTP POST request and handles the JSON response
-func SendRequest(data interface{}, nagFunction string, nagURL string) map[string]interface{} {
+func sndRequest(data interface{}, nagFunction string, nagURL string) map[string]interface{} {
 	url := nagURL + nagFunction
 
 	// Convert the data to JSON
@@ -104,8 +104,8 @@ func SendRequest(data interface{}, nagFunction string, nagURL string) map[string
 	return response
 }
 
-// PadNumber pads a number with leading zeros to number less than 10
-func PadNumber(number int) string {
+// padNumber pads a number with leading zeros to number less than 10
+func padNumber(number int) string {
 	if number < 10 {
 		return fmt.Sprintf("0%d", number)
 	}
@@ -113,7 +113,7 @@ func PadNumber(number int) string {
 }
 
 // Generate formatted timestamp in the format YYYY-MM-DD-HH:MM:SS
-func GetFormattedTimestamp() string {
+func getFormattedTimestamp() string {
 	t := time.Now()
 	return fmt.Sprintf("%d:%s:%s-%s:%s:%s", t.Year(), PadNumber(int(t.Month())), PadNumber(t.Day()), PadNumber(t.Hour()), PadNumber(t.Minute()), PadNumber(t.Second()))
 }
@@ -123,13 +123,13 @@ type ECSignature struct {
 	R, S *big.Int
 }
 
-/* // SignMessage firma un messaggio con una chiave privata in formato hex e restituisce la firma in formato hex.
+/* // signMessage firma un messaggio con una chiave privata in formato hex e restituisce la firma in formato hex.
 * @param message string - message to sign
 * @param privateKey string - private key in hex format
 * @return string - signature in hex format
  */
 
-func SignMessage(message string, privateKey string) map[string]interface{} {
+func signMessage(message string, privateKey string) map[string]interface{} {
 
 	bytesPrivateKey, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -168,12 +168,12 @@ type ECDSASignature struct {
 }
 
 // StringToHex converts a string to a hexadecimal string
-func StringToHex(str string) string {
+func stringToHex(str string) string {
 	return hex.EncodeToString([]byte(str))
 }
 
 // HexToString coneverts a hexadecimal string to a string
-func HexToString(hexStr string) (string, error) {
+func hexToString(hexStr string) (string, error) {
 	bytes, err := hex.DecodeString(hexStr)
 	if err != nil {
 		return "", err
@@ -182,7 +182,7 @@ func HexToString(hexStr string) (string, error) {
 }
 
 // HexFix removes the prefix "0x"
-func HexFix(word interface{}) string {
+func hexFix(word interface{}) string {
 	switch v := word.(type) {
 	case int:
 		return fmt.Sprintf("%x", v)
@@ -196,8 +196,8 @@ func HexFix(word interface{}) string {
 	}
 }
 
-// Sha256 calculates the SHA-256 hash of a string
-func Sha256(data string) string {
+// sha256 calculates the SHA-256 hash of a string
+func sha256(data string) string {
 	hash := sha256.Sum256([]byte(data))
 	return hex.EncodeToString(hash[:])
 }
