@@ -73,7 +73,7 @@ func main() {
 	fmt.Printf("Network: %s, NAG URL: %s\n", account.Network, account.NAGURL)
 	fmt.Printf("Blockchain ID: %s\n", account.Blockchain)
 
-	// 3. Update Account (Fetch Nonce)
+	// 2. Update Account (Fetch Nonce)
 	// In a real scenario, this queries the network for the latest nonce.
 	// The current implementation has a placeholder for this HTTP call.
 	fmt.Println("Attempting to update account (fetch nonce)...")
@@ -187,21 +187,21 @@ getTransactionbyID(TxID, Start, End): Searches for a transaction by its ID.
 
 ### `CCertificate` Method
 
-*   `SetData(data string)`
-*   `GetData() (string, error)`
-*   `GetJSONCertificate() (string, error)`
-*   `GetCertificateSize() (int, error)`
+-   [x] `SetData(data string)`
+-   [x] `GetData() (string, error)`
+-   [x] `GetJSONCertificate() (string, error)`
+-   [x] `GetCertificateSize() (int, error)`
 
 ### Exposed `CEPAccount` Method
-*   `Open(address string)`
-*   `UpdateAccount() (bool, error)`
-*   `SetNetwork(network string) error`
-*   `SetBlockchain(chain string)`
-*   `Close()`
-*   `SignData(data, privateKey string) (string, error)`
-*   `SubmitCertificate(pdata, privateKey string) (map[string]interface{}, error)`
-*   `GetTransactionOutcome(txID string, timeoutSec int) (map[string]interface{}, error)`
-*   `GetTransactionbyID(txID string, start, end int) (map[string]interface{}, error)`
+-   [x] `Open(address string) error`
+-   [x] `UpdateAccount() (bool, error)`
+-   [x] `SetNetwork(network string) error`
+-   [x] `SetBlockchain(chain string)`
+-   [x] `Close()`
+-   [x] `SignData(data, privateKey string) (string, error)`
+-   [x] `GetTransactionbyID(txID string, start, end int) (map[string]interface{}, error)`
+-   [x] `SubmitCertificate(pdata, privateKey string) (map[string]interface{}, error)`
+-   [x] `GetTransactionOutcome(txID string, timeoutSec int) (map[string]interface{}, error)`
 
 ***
 
