@@ -1,11 +1,6 @@
 package circular_protocol_enterprise_api
 
 import (
-	"encoding/json"
-)
-package circular
-
-import (
 	"encoding/hex"
 	"encoding/json"
 )
