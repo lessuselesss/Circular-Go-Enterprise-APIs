@@ -168,21 +168,26 @@ func main() {
 }
 ```
 
-## API Overview
+### API
 
-The primary components of this API are:
+#### `CCERTIFICATE` Methods
 
-*   **`circular_protocol_api.Account`**:
-    *   Manages account state (address, network, nonce).
-    *   Handles interactions with the Circular Network Access Gateway (NAG) for operations like updating account nonce, submitting certificates, and querying transactions.
-    *   Provides data signing capabilities.
-*   **`circular_protocol_api.Certificate`**:
-    *   Represents a data certificate.
-    *   Methods to set/get data, get JSON representation, and certificate size.
-*   **`utils.GetFormattedUTCTimestamp()`**:
-    *   A utility function to generate a UTC timestamp string in the format `YYYY-MM-DDTHH:MM:SSZ`.
+-   `setData(data)`: Sets the data content of the certificate.
+-   `getData()`: Retrieves the data content of the certificate.
+-   `getJSONCertificate()`: Returns the certificate as a JSON string.
+-   `getCertificateSize()`: Returns the size of the certificate in bytes.
 
-**Note on Network Interactions:** The methods involving direct communication with the Circular Network Access Gateway (`UpdateAccount`, `SubmitCertificate`, `GetTransactionOutcome`, `GetTransaction`) currently use placeholder URLs and logic. For actual use, these will need to be configured with the correct NAG API endpoints and request/response structures provided by Circular Protocol. The example above includes mocked responses for these calls to illustrate the intended API flow.
+#### `CEP_Account` Methods
+
+-   `open(address)`: Opens an account with the given address.
+-   `updateAccount()`: Updates the account's Nonce by querying the network.
+-   `setNetwork(network)`: Sets the blockchain network.
+-   `setBlockchain(chain)`: Sets the blockchain address.
+-   `close()`: Closes the account and resets all fields.
+-   `signData(data, privateKey)`: Signs data using the account's private key.
+-   `submitCertificate(pdata, privateKey)`: Submits a certificate to the blockchain.
+-   `GetTransactionOutcome(TxID, timeoutSec)`: Polls for transaction outcome.
+-   `getTransactionbyID(TxID, Start, End)`: Searches for a transaction by its ID.
 
 ## Contributing
 
