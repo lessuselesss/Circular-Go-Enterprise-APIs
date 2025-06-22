@@ -11,7 +11,7 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      go-pkg = pkgs.go_1_23;
+      go-pkg = pkgs.go_1_24;
 
       # Define claude-task-master as a Nix package
       claude-task-master-pkg = pkgs.buildNpmPackage {
@@ -40,6 +40,12 @@
           pkgs.nodejs
           claude-task-master-pkg
         ];
+        shellHook = ''
+          echo "Nix shellHook executed. Setting up tm wrapper..."
+          mkdir -p $TMPDIR/nix-shell-bin
+          ln -sf "$(which task-master)" $TMPDIR/nix-shell-bin/tm
+          export PATH=$TMPDIR/nix-shell-bin:$PATH
+        '';
       };
     };
 }

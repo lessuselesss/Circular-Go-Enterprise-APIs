@@ -1,0 +1,11 @@
+set = "default"
+severity = "warning"
+confidence = 0.8
+
+[rule.exported]
+arguments = ["checkReturn", "checkStructs", "checkMethods"]
+
+[rule.var-declaration]
+arguments = ["maxLineLength"]
+
+[rule.package-comments]
