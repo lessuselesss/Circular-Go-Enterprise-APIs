@@ -38,6 +38,7 @@
           go-pkg
           pkgs.gopls
           pkgs.nodejs
+          pkgs.gh
           claude-task-master-pkg
         ];
         shellHook = ''
