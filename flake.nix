@@ -11,7 +11,7 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      go-pkg = pkgs.go_1_24;
+      go-pkg = pkgs.go_1_23;
 
       # Define claude-task-master as a Nix package
       claude-task-master-pkg = pkgs.buildNpmPackage {
