@@ -6,10 +6,9 @@
 .windsurf*
 .cline*
 .taskmaster*
+.kilocode*
 
-
-
-
+.direnv*
 
 # Logs
 logs
