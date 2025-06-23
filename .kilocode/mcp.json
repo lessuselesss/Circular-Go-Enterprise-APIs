@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "/home/lessuseless/Projects/circular/gogogo"]
+    },
     "taskmaster-ai": {
       "command": "npx",
       "args": [
@@ -12,7 +16,7 @@
         "PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE",
         "OPENAI_API_KEY": "YOUR_OPENAI_KEY_HERE",
         "GOOGLE_API_KEY": "AIzaSyCtLRDx8lVHOtS_gc5G9NpSIos8ATaiJoI",
-        "MISTRAL_API_KEY": "YOUR_MISTRAL_KEY_HERE",
+        "MISTRAL_A'PI_KEY": "YOUR_MISTRAL_KEY_HERE",
         "OPENROUTER_API_KEY": "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",
         "XAI_API_KEY": "YOUR_XAI_KEY_HERE",
         "AZURE_OPENAI_API_KEY": "YOUR_AZURE_KEY_HERE",
@@ -24,20 +28,18 @@
         "get_tasks",
         "get_task",
         "set_task_status",
-        "use_tag"
+        "use_tag",
+        "expand_task",
+        "add_subtask",
+        "clear_subtasks"
       ]
     },
-    "git": {
-      "type": "stdio",
-      "command": "node",
-      "args": [],
-      "alwaysAllow": [
-        "git_checkout",
-        "git_fetch_origin",
-        "git_commit",
-        "git_add",
-        "git_status",
-        "git_create_branch"
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${workspaceFolder}"
       ]
     }
   }

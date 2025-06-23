@@ -40,6 +40,7 @@
           pkgs.nodejs
           pkgs.gh
           claude-task-master-pkg
+          pkgs.python3Packages.mcp-server-git
         ];
         shellHook = ''
           echo "Nix shellHook executed. Setting up tm wrapper..."

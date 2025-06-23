@@ -209,7 +209,87 @@ A phased approach will be used to ensure systematic development and quality.
 Focus on core `CEP_Account` and `C_CERTIFICATE` functionalities, including account management, network configuration, data certification, data signing, and basic transaction monitoring. This phase aims to deliver a functional, secure, and idiomatic Go library that can perform essential Circular Protocol operations.
 
 ## API Implementation Logic
-Here are the idiomatic Go struct definitions, interfaces (where applicable), and their corresponding doc comments to reproduce the logic of the Enterprise API functions you've listed. In Go, "classes" are typically represented by `struct` types with associated `methods`, and "logic" is provided by these methods and their internal implementations.
+
+Here are the helpers and idiomatic Go struct definitions, interfaces (where applicable), and their corresponding doc comments to reproduce the logic of the Enterprise API functions you've listed. In Go, "classes" are typically represented by `struct` types with associated `methods`, and "logic" is provided by these methods and their internal implementations.
+```go
+package circular_cep_api
+// padNumber adds a leading zero to numbers less than 10.
+// It takes an integer 'num' and returns a string representation of the padded number.
+func padNumber(num int) string {
+    if num < 10 {
+        return "0" + strconv.Itoa(num)
+    }
+    return strconv.Itoa(num)
+}
+
+Explanation: Function documentation in Go should explain what the function returns or what it does if it has side effects. Doc comments should generally be placed immediately before the declaration of the function. While the original was JavaScript, in Go, the strconv package would be used for integer to string conversion.
+// getFormattedTimestamp formats the current UTC date and time into a specific string format:
+// "YYYY:MM:DD-HH:MM:SS".
+// It returns the formatted timestamp string.
+func getFormattedTimestamp() string {
+    // In Go, you would typically use the time package for UTC and formatting.
+    // The following is a conceptual translation, assuming padNumber is adapted for Go.
+    /*
+    t := time.Now().UTC()
+    year := t.Year()
+    month := padNumber(int(t.Month()))
+    day := padNumber(t.Day())
+    hours := padNumber(t.Hour())
+    minutes := padNumber(t.Minute())
+    seconds := padNumber(t.Second())
+
+    return fmt.Sprintf("%d:%s:%s-%s:%s:%s", year, month, day, hours, minutes, seconds)
+    */
+    return "example:formatted:timestamp" // Placeholder for Go implementation
+}
+
+Explanation: Go function comments should clearly state what the function does. Named parameters and results can be directly referenced in the comment. The Go fmt package offers formatted printing, similar to C's printf family, and functions like fmt.Sprintf return a string.
+// HexFix removes the "0x" prefix from a hexadecimal string if present.
+// If the input 'word' is not a string, it returns an empty string.
+// Otherwise, it returns the string with the "0x" prefix removed.
+// Go's integer literals can use "0x" as a prefix for hexadecimal values [17-25].
+func HexFix(word string) string { // Assuming word is always a string in Go context
+    if strings.HasPrefix(word, "0x") || strings.HasPrefix(word, "0X") {
+        return word[2:]
+    }
+    return word
+}
+
+Explanation: Doc comments should not explain internal details like the algorithm used, but rather the function's purpose and behavior. The 0x or 0X prefix is used for hexadecimal integer literals in Go.
+// StringToHex converts a string to its hexadecimal representation.
+// It correctly handles multi-byte Unicode characters by encoding the string as UTF-8
+// before conversion. The resulting hexadecimal string does not include a "0x" prefix.
+// In Go, a string can be converted to a slice of bytes, where successive bytes are the elements of the slice [7-15].
+// The `%x` format verb in `fmt.Sprintf` can be used to generate a hexadecimal string from strings or byte arrays [26].
+func StringToHex(str string) string {
+    // In Go, you would convert the string to a byte slice and then format it to hex.
+    // For example, using "encoding/hex" or "fmt.Sprintf".
+    /*
+    return hex.EncodeToString([]byte(str))
+    */
+    return "examplehex" // Placeholder for Go implementation
+}
+
+Explanation: Go function documentation should be detailed about what the function does and how it handles specific inputs, such as multi-byte characters. Converting a string to a slice of bytes in Go yields a slice whose elements are the bytes of the string. Formatted printing with %x works on strings and byte arrays to produce a hexadecimal string.
+// HexToString converts a hexadecimal string back to a regular string.
+// It first removes any "0x" prefix using HexFix (if adapted for Go) and then decodes the hexadecimal
+// string into a byte buffer, interpreting it as a UTF-8 string to correctly reconstruct
+// multi-byte Unicode characters.
+// Converting a slice of bytes to a string in Go yields a string whose successive bytes are the elements of the slice [7-15].
+func HexToString(hexStr string) string {
+    // In Go, you would use "encoding/hex" to decode and then cast to string.
+    // Assuming HexFix is also implemented in Go.
+    fixedHex := HexFix(hexStr)
+    /*
+    decoded, err := hex.DecodeString(fixedHex)
+    if err != nil {
+        return "" // Or handle error appropriately
+    }
+    return string(decoded)
+    */
+    return "example string" // Placeholder for Go implementation
+}
+```
 
 ```go
 package circular_cep_api
