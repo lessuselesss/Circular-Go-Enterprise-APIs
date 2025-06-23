@@ -1,0 +1,16 @@
+{
+  "testnet": {
+    "main_account": {
+      "private_key": "03bc1511837430581a9151cd6eb1b34c0dd4f8b90cb38c4b772b943a9c94717f",
+      "seed_phrase": "dirt fat sorry guitar jungle traffic bean garage member cabin learn duty"
+    },
+    "secondary_account": {
+      "private_key": "949f1b13f64bfcb1493a04bebc3a66cad4b26e872708a756e02730159629e0d6", 
+      "seed_phrase": "fly anger alley usual long music fruit melody garden solution host motion"
+    },
+    "network": "testnet",
+    "nag_urls": {
+      "testnet": "https://nag-testnet.circular.io"
+    }
+  }
+}

@@ -2,10 +2,11 @@
   description = "Go Enterprise APIs for Circular";
 
   inputs = {
+    claude-code.url = "github:olebedev/claude-code.nix";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, claude-code }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -40,7 +41,10 @@
           pkgs.nodejs
           pkgs.gh
           claude-task-master-pkg
-          pkgs.python3Packages.mcp-server-git
+          claude-code.packages.${system}.default
+          pkgs.python3
+          pkgs.python3Packages.pip
+          pkgs.python3Packages.python-dotenv
         ];
         shellHook = ''
           echo "Nix shellHook executed. Setting up tm wrapper..."

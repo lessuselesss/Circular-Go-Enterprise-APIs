@@ -1,0 +1,8 @@
+#!/bin/bash
+# TDD Automation Wrapper Script
+
+# Ensure we're in the project directory
+cd "$(dirname "$0")"
+
+# Run the automation script with nix environment
+exec nix develop --command ./automation/tdd-automation "$@"

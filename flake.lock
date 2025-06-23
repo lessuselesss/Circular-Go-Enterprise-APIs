@@ -1,12 +1,63 @@
 {
   "nodes": {
+    "claude-code": {
+      "inputs": {
+        "js2nix": "js2nix",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1749081670,
+        "narHash": "sha256-y6tg19l+DthFaqG7jzygSIVZ/7Bh1pzhTIoa9YX8NNg=",
+        "owner": "olebedev",
+        "repo": "claude-code.nix",
+        "rev": "902c744e5ecccedae5388948c4d7563bf273e319",
+        "type": "github"
+      },
+      "original": {
+        "owner": "olebedev",
+        "repo": "claude-code.nix",
+        "type": "github"
+      }
+    },
+    "js2nix": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1740636466,
+        "narHash": "sha256-udsxrWLtAaBkh++pqal3u5+hI0YhWI06O2UaC6IS5lY=",
+        "owner": "canva-public",
+        "repo": "js2nix",
+        "rev": "8cd32b5c87767b019e0960b27599f6b9d195ddb0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "canva-public",
+        "repo": "js2nix",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1750386251,
-        "narHash": "sha256-1ovgdmuDYVo5OUC5NzdF+V4zx2uT8RtsgZahxidBTyw=",
+        "lastModified": 1741402956,
+        "narHash": "sha256-y2hByvBM03s9T2fpeLjW6iprbxnhV9mJMmSwCHc41ZQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "076e8c6678d8c54204abcb4b1b14c366835a58bb",
+        "rev": "ed0b1881565c1ffef490c10d663d4f542031dad3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1750605355,
+        "narHash": "sha256-xT8cPLTxlktxI9vSdoBlAVK7dXgd8IK59j7ZwzkkhnI=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3078b9a9e75f1790e6d6ef9955fdc6a2d1740cc6",
         "type": "github"
       },
       "original": {
@@ -18,7 +69,8 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "claude-code": "claude-code",
+        "nixpkgs": "nixpkgs_2"
       }
     }
   },
