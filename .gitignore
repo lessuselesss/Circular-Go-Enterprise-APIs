@@ -42,3 +42,7 @@ pkg/
 # OS specific
 .DS_Store
 .aider*
+
+# Task files
+# tasks.json
+# tasks/ 

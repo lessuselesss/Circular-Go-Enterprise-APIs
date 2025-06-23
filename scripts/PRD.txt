@@ -27,6 +27,11 @@ The scope encompasses the full porting of all existing Circular Protocols Enterp
 ## Core Features
 The Go API will replicate the established functionalities of the Circular Protocols Enterprise API, offering a complete set of tools for data certification on the blockchain.
 
+### Helper Utilities:
+*   **What it does**: Includes helper functions for hexadecimal conversion and UTC timestamp generation.
+*   **Why it's important**: Streamlines common tasks, reducing boilerplate code for developers.
+*   **How it works at a high level**: These will be utility functions available within the Go module.
+
 ### Account Management:
 *   **What it does**: Allows users to open, update (specifically, account nonce), and close their blockchain accounts. Account creation typically involves naming the account and selecting a network (e.g., Mainnet for production). Organizations are first created via email verification and organizational details.
 *   **Why it's important**: Provides fundamental control over a user's identity and interaction points with the Circular Protocol.
@@ -51,11 +56,6 @@ The Go API will replicate the established functionalities of the Circular Protoc
 *   **What it does**: Allows users to poll for the outcome of submitted transactions and retrieve detailed information about specific transactions using their Transaction ID. Certified records can be viewed in an explorer with details like Certificate ID, creation timestamp, size, and issuing account.
 *   **Why it's important**: Provides visibility and confirmation of on-chain operations.
 *   **How it works at a high level**: The API will provide functions to query the network for transaction status and details, including polling mechanisms for asynchronous operations.
-
-### Helper Utilities:
-*   **What it does**: Includes helper functions for hexadecimal conversion and UTC timestamp generation.
-*   **Why it's important**: Streamlines common tasks, reducing boilerplate code for developers.
-*   **How it works at a high level**: These will be utility functions available within the Go module.
 
 ## User Experience (Developer Experience)
 The developer experience (DX) is a critical focus for this Go API, aiming to make integration as seamless and productive as possible.
@@ -89,6 +89,56 @@ The API will be packaged as a Go module, facilitating dependency management and 
 *   **Low-Level SDK**: This will provide direct access to the core API functions and data structures, allowing developers maximum control over their interactions with the Circular Protocol.
 *   **Higher-Level CLI**: A command-line interface will be built on top of the SDK, offering simplified commands for common operations, enhancing usability for quick tasks and automation. The `cobra` package is a strong candidate for building this CLI.
 
+### Project Structure:
+The Go project will adhere to a flat, simple structure, prioritizing clarity and discoverability, organized by functionality rather than layers, to avoid deep nesting.
+
+#### Go Project Structure According to Google Style Guide
+
+##### Standard Layout Principles
+
+Google's Go style guide emphasizes a **flat, simple structure** that prioritizes clarity and discoverability. The key principle is organizing code by **functionality rather than layers**, avoiding deep nesting that can obscure the actual purpose of packages.
+
+##### Recommended Structure for Your Project
+
+Based on the project tasks and Google's guidelines, here's the optimal structure:
+
+```
+circular-protocol-go-enterprise-apis/
+├── cmd/
+│   └── cli/           # CLI application (Task 12)
+│       └── main.go
+├── internal/
+│   ├── client/        # Network client implementation (Task 2)
+│   ├── account/       # CEP_Account implementation (Tasks 3, 4)
+│   ├── signing/       # Data signing utilities (Task 6)
+│   └── config/        # Network configuration
+├── api/               # Public SDK interfaces (Task 10)
+├── testdata/          # Test fixtures and data
+├── examples/          # Usage examples
+└── go.mod
+```
+
+##### Package Organization Guidelines
+
+**`cmd/` Package**: Contains main applications. Each subdirectory should have a `main.go` file. This aligns with your CLI development task and follows Google's convention of keeping application entry points separate from library code.
+
+**`internal/` Package**: Houses implementation details that shouldn't be imported by external users. This is crucial for your SDK design - it allows you to iterate on internals without breaking API compatibility. Your network client, account management logic, and signing utilities belong here.
+
+**`api/` Package**: Defines your public SDK interfaces. Google recommends keeping public APIs minimal and well-documented. This package should contain only what external developers need to interact with your SDK.
+
+##### Key Design Decisions
+
+**Avoid Generic Names**: Instead of `utils/` or `helpers/`, use specific names like `client/` or `signing/`. This makes the codebase more navigable and aligns with Google's preference for descriptive package names.
+
+**Minimize Package Depth**: Keep your hierarchy shallow. Google's style guide suggests that if you need more than 2-3 levels of nesting, you should reconsider your organization.
+
+**Single Responsibility**: Each package should have a clear, single purpose. Your `client/` package handles network communication, `account/` manages account operations, and `signing/` handles cryptographic operations.
+
+##### Testing Integration
+
+Place test files alongside the code they test using the `_test.go` suffix. For your comprehensive testing framework (Task 11), organize integration tests in a dedicated `integration_test.go` file within relevant packages, and use the `testdata/` directory for fixtures.
+
+This structure supports your TDD approach while maintaining clean separation between public interfaces and internal implementation details.
 ### Secure Private Key Handling:
 The API will ensure that private keys are managed securely and are never directly exposed through the API interface.
 
@@ -152,6 +202,22 @@ A phased approach will be used to ensure systematic development and quality.
     *   Final security review and vulnerability assessment.
     *   Preparation of release notes and deployment guides.
 *   **Launch**: Circular Protocols Enterprise API Go Implementation v1.0.1
+
+## Development Roadmap
+-   **MVP Requirements**: Focus on core `CEP_Account` and `C_CERTIFICATE` functionalities, including account management, network configuration, data certification, data signing, and basic transaction monitoring. This phase aims to deliver a functional, secure, and idiomatic Go library that can perform essential Circular Protocol operations.
+-   **Future Enhancements**: After the MVP, consider expanding transaction monitoring capabilities (e.g., advanced querying, event subscriptions), adding support for more complex certificate types, and enhancing developer tooling based on community feedback.
+
+## Logical Dependency Chain
+-   **Foundation**:
+    1.  **Helpers/Utilities**: Implement core utility functions (hex conversion, timestamp generation) first, as they are fundamental dependencies for other components.
+    2.  **CEP Account**: Implement the `CEP_Account` struct and its methods, which will handle account management, network configuration, and transaction submission. This will depend on the `helpers` and `network client` components.
+    3.  **C Certificate**: Implement the `C_CERTIFICATE` struct and its methods, which will handle data formatting for certificates. This will depend on the `helpers` component.
+    4.  **Network Client**: Develop the network communication logic, ensuring robust HTTP/HTTPS interactions and error handling. This will be a dependency for `CEP_Account`.
+-   **Testing Strategy**:
+    -   **Failure Cases First**: For each piece of logic, begin by writing a failure case to define expected error behavior.
+    -   **Idiomatic Error Handling**: Implement error handling using Go's idiomatic patterns, returning explicit errors and ensuring "bubble up" logic where appropriate, referencing the `nodejs-enterprise-apis/lib/index.js` for error types and structure.
+    -   **Unit Tests**: Write unit tests for each function and method immediately after its implementation.
+    -   **Integration Tests**: Start writing integration tests *after* the core library components are complete and passing their respective unit tests.
 
 ## Post-launch QA/Validation Strategies
 Continuous monitoring and feedback loops will be essential for the long-term success and stability of the Go API.
