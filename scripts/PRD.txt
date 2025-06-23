@@ -205,6 +205,354 @@ A phased approach will be used to ensure systematic development and quality.
 
 ## Development Roadmap
 -   **MVP Requirements**: Focus on core `CEP_Account` and `C_CERTIFICATE` functionalities, including account management, network configuration, data certification, data signing, and basic transaction monitoring. This phase aims to deliver a functional, secure, and idiomatic Go library that can perform essential Circular Protocol operations.
+## MVP Requirements
+Focus on core `CEP_Account` and `C_CERTIFICATE` functionalities, including account management, network configuration, data certification, data signing, and basic transaction monitoring. This phase aims to deliver a functional, secure, and idiomatic Go library that can perform essential Circular Protocol operations.
+
+## API Implementation Logic
+Here are the idiomatic Go struct definitions, interfaces (where applicable), and their corresponding doc comments to reproduce the logic of the Enterprise API functions you've listed. In Go, "classes" are typically represented by `struct` types with associated `methods`, and "logic" is provided by these methods and their internal implementations.
+
+```go
+package circular_cep_api
+
+import (
+	"encoding/json"
+	"time" // Used for timestamps in example responses and timeout duration.
+	// Other imports like "net/http" or "crypto/ecdsa" would be needed for a full implementation.
+)
+
+// Package circular_cep_api provides the core services and data structures for
+// interacting with the Circular Protocols Enterprise API.
+//
+// This library offers functionalities for managing blockchain accounts,
+// creating and submitting data certificates, signing data, and monitoring
+// transaction outcomes on the Circular blockchain. It includes
+// tools for managing accounts, setting network configurations, data signing,
+// and transaction monitoring. Specific operations include
+// opening, updating, and closing accounts; setting network and blockchain
+// configurations; and retrieving transaction details.
+package circular_cep_api
+
+// 1. Account represents a client for interacting with the Circular Protocols Enterprise API.
+//
+// An Account object manages the state and provides methods for blockchain interactions
+// such as managing accounts, submitting certificates, and querying transactions.
+// It maintains internal configurations like the current network and blockchain address.
+type Account struct {
+	// nagURL stores the Network Access Gateway URL for API requests.
+	// This field is unexported as it's an internal detail of the account's operations.
+	nagURL string
+	// network specifies the currently configured blockchain network (e.g., "testnet", "devnet", "mainnet").
+	// This field is unexported as its modification is handled by SetNetwork.
+	network string
+	// blockchain specifies the currently configured blockchain address where certificates are managed.
+	// This field is unexported as its modification is handled by SetBlockchain.
+	blockchain string
+	// nonce holds the account's current Nonce, which is updated by calling UpdateAccount.
+	// This is important for transaction ordering and replay protection.
+	nonce string
+	// lastError stores the most recent error message encountered by an account operation.
+	// This is seen in examples of other language implementations.
+	lastError string
+}
+
+// 2. Certificate represents a data certificate that can be certified on the blockchain.
+// It encapsulates the data content and provides utility methods for certificate operations.
+type Certificate struct {
+	// data holds the raw content of the certificate. This field is unexported as its
+	// access is controlled via SetData and GetData methods.
+	data []byte
+}
+
+// 3. TransactionResponse represents the detailed outcome of a transaction on the blockchain.
+//
+// This structure is used for responses from methods like GetTransactionOutcome and
+// GetTransactionByID, containing comprehensive details about the transaction
+// including blockchain identifiers, fees, status, and timestamps.
+type TransactionResponse struct {
+	Result   int    `json:"Result"`   // HTTP-like status code indicating the operation's success or failure.
+	Response struct {
+		BlockID       string  `json:"BlockID"`       // The identifier of the block in which the transaction was recorded.
+		BroadcastFee  float64 `json:"BroadcastFee"`  // The fee incurred for broadcasting the transaction.
+		DeveloperFee  float64 `json:"DeveloperFee"`  // Any developer fees associated with the transaction.
+		From          string  `json:"From"`          // The blockchain address from which the transaction originated.
+		GasLimit      float64 `json:"GasLimit"`      // The gas limit set for the transaction.
+		ID            string  `json:"ID"`            // The unique identifier of the transaction.
+		Instructions  int     `json:"Instructions"`  // The number of instructions processed by the transaction.
+		NagFee        float64 `json:"NagFee"`        // The Network Access Gateway fee.
+		NodeID        string  `json:"NodeID"`        // The ID of the node that processed the transaction.
+		Nonce         string  `json:"Nonce"`         // The nonce value of the account at the time of the transaction.
+		OSignature    string  `json:"OSignature"`    // The original signature of the transaction.
+		Payload       string  `json:"Payload"`       // The hexadecimal representation of the data payload.
+		ProcessingFee float64 `json:"ProcessingFee"` // The fee for processing the transaction.
+		ProtocolFee   float64 `json:"ProtocolFee"`   // The protocol fee.
+		Status        string  `json:"Status"`        // The execution status of the transaction (e.g., "Executed").
+		Timestamp     string  `json:"Timestamp"`     // The UTC timestamp when the transaction occurred.
+		To            string  `json:"To"`            // The blockchain address to which the transaction was sent.
+		Type          string  `json:"Type"`          // The type of transaction (e.g., "C_TYPE_CERTIFICATE").
+	} `json:"Response"`
+	Node    string `json:"Node"`    // The address of the node that handled the request.
+	Message string `json:"message"` // An optional message, typically present on error (Result != 200).
+}
+
+// 4. SubmitCertificateResponse represents the outcome of a certificate submission.
+// It provides the transaction ID and timestamp upon successful submission.
+type SubmitCertificateResponse struct {
+	Result   int `json:"Result"` // Result code, 200 for success.
+	Response struct {
+		TxID      string `json:"TxID"`      // The unique transaction ID generated for the certificate.
+		Timestamp string `json:"Timestamp"` // The UTC timestamp of the certificate submission.
+	} `json:"Response"`
+	Node    string `json:"Node"`    // The address of the node that handled the submission.
+	Message string `json:"message"` // An optional message, typically present on error (Result != 200).
+}
+
+// --- Certificate Methods (C_CERTIFICATE Class) ---
+
+// 5. SetData sets the data content of the certificate.
+//
+// The data parameter is the raw byte slice containing the content
+// that this certificate will represent.
+func (c *Certificate) SetData(data []byte) { //
+	c.data = data
+}
+
+// 6. GetData retrieves the raw data content of the certificate.
+//
+// It returns a byte slice representing the data stored within the certificate.
+func (c *Certificate) GetData() []byte { //
+	return c.data
+}
+
+// 7. GetJSONCertificate returns the certificate's data as a JSON string.
+//
+// This method serializes the internal data content of the certificate
+// into a JSON formatted string.
+// A more robust implementation would handle potential JSON marshaling errors.
+func (c *Certificate) GetJSONCertificate() string { //
+	// Example: If data is expected to be a JSON string, return it directly.
+	// If it's arbitrary bytes, you might want to wrap it in a JSON object.
+	// For this example, assuming 'data' is the actual content you'd put in JSON.
+	jsonString, err := json.Marshal(map[string]interface{}{"data": string(c.data)})
+	if err != nil {
+		return "{}" // Return empty JSON on error
+	}
+	return string(jsonString)
+}
+
+// 8. GetCertificateSize returns the size of the certificate in bytes.
+//
+// This method typically calculates the size of the certificate's
+// data content in bytes.
+func (c *Certificate) GetCertificateSize() int { //
+	return len(c.data)
+}
+
+// --- Account Methods (CEP_Account Class) ---
+
+// 9. Open initializes the Account instance with a given blockchain address.
+//
+// The address parameter is the wallet address associated with this account.
+// This method prepares the account for subsequent interactions with the network.
+// It returns an error if the account cannot be opened or initialized.
+func (a *Account) Open(address string) error { //
+	// In a full implementation, this would involve setting the account address
+	// and potentially performing initial network checks or loading keys.
+	// Examples from other languages suggest this primarily sets an internal address property.
+	return nil // Return nil on success
+}
+
+// 10. UpdateAccount queries the network to update the account's current Nonce.
+//
+// This operation is crucial for ensuring correct transaction sequencing and
+// is typically called before submitting new certificates or transactions.
+// It returns true if the nonce was successfully updated, false otherwise, along with an error.
+func (a *Account) UpdateAccount() (bool, error) { //
+	// In a full implementation, this would make an API call to fetch the latest nonce.
+	// For example: a.nonce = fetchedNonce
+	return true, nil // Simplified placeholder for success
+}
+
+// 11. SetNetwork configures the blockchain network for the account.
+//
+// The network parameter specifies which network to interact with (e.g., "testnet",
+// "devnet", or "mainnet").
+// No explicit return value is documented for the original API, implying it's a setter function.
+func (a *Account) SetNetwork(network string) { //
+	a.network = network
+}
+
+// 12. SetBlockchain sets the specific blockchain address for the account.
+//
+// The chain parameter is the address of the blockchain instance where
+// certificates will be created and searched.
+// No explicit return value is documented for the original API, implying it's a setter function.
+func (a *Account) SetBlockchain(chain string) { //
+	a.blockchain = chain
+}
+
+// 13. Close gracefully closes the account and resets its internal fields.
+//
+// This method should be called to clean up any resources or connections
+// associated with the account, ensuring a proper shutdown.
+// No explicit return value is documented.
+func (a *Account) Close() { //
+	// Reset internal state for cleanup.
+	a.nagURL = ""
+	a.network = ""
+	a.blockchain = ""
+	a.nonce = ""
+	a.lastError = ""
+}
+
+// 14. SignData signs the provided data using the account's private key.
+//
+// The data parameter is the content (as a byte slice) to be cryptographically
+// signed. The privateKey is the string representation of the account's private key.
+// It returns the signed data as a byte slice and an error if the signing process fails.
+func (a *Account) SignData(data []byte, privateKey string) ([]byte, error) { //
+	// In a full implementation, this would involve cryptographic signing operations (e.g., ECDSA).
+	return []byte("simulated_signed_data_for_" + string(data)), nil
+}
+
+// 15. SubmitCertificate submits the given data as a certificate to the blockchain.
+//
+// The pdata parameter is the data content of the certificate to be submitted.
+// The privateKey is used to authorize and sign the transaction on the blockchain.
+// It returns a pointer to a SubmitCertificateResponse containing the transaction ID and timestamp
+// upon success, or an error if the submission fails.
+func (a *Account) SubmitCertificate(pdata []byte, privateKey string) (*SubmitCertificateResponse, error) { //
+	// In a full implementation, this would involve constructing and sending an API request.
+	// The response structure is based on the "Expected Result" from source.
+	resp := &SubmitCertificateResponse{
+		Result: 200,
+		Response: struct {
+			TxID      string `json:"TxID"`
+			Timestamp string `json:"Timestamp"`
+		}{
+			TxID:      "simulated_tx_id_" + time.Now().Format("150405"),
+			Timestamp: time.Now().Format("2006:01:02-15:04:05_UTC"),
+		},
+		Node: "simulated_node_address",
+	}
+	return resp, nil
+}
+
+// 16. GetTransactionOutcome polls the blockchain to retrieve the outcome of a transaction.
+//
+// This method is designed to provide the transaction outcome as soon as it gets
+// executed on the blockchain.
+// The txID parameter is the unique identifier of the transaction (e.g., obtained
+// from SubmitCertificate response).
+// The timeoutSec parameter specifies the maximum duration in seconds to wait for
+// the transaction outcome.
+// It returns a pointer to a TransactionResponse with detailed transaction information, or an error.
+func (a *Account) GetTransactionOutcome(txID string, timeoutSec int) (*TransactionResponse, error) { //
+	// In a full implementation, this would involve continuous polling with delays.
+	// The response structure is comprehensive based on "Expected Result" from source.
+	resp := &TransactionResponse{
+		Result: 200,
+		Response: struct {
+			BlockID       string  `json:"BlockID"`
+			BroadcastFee  float64 `json:"BroadcastFee"`
+			DeveloperFee  float64 `json:"DeveloperFee"`
+			From          string  `json:"From"`
+			GasLimit      float64 `json:"GasLimit"`
+			ID            string  `json:"ID"`
+			Instructions  int     `json:"Instructions"`
+			NagFee        float64 `json:"NagFee"`
+			NodeID        string  `json:"NodeID"`
+			Nonce         string  `json:"Nonce"`
+			OSignature    string  `json:"OSignature"`
+			Payload       string  `json:"Payload"`
+			ProcessingFee float64 `json:"ProcessingFee"`
+			ProtocolFee   float64 `json:"ProtocolFee"`
+			Status        string  `json:"Status"`
+			Timestamp     string  `json:"Timestamp"`
+			To            string  `json:"To"`
+			Type          string  `json:"Type"`
+		}{
+			BlockID:       "simulated_block_id_for_" + txID,
+			BroadcastFee:  1.0,
+			DeveloperFee:  0.0,
+			From:          "your_wallet_address",
+			GasLimit:      0.0,
+			ID:            txID,
+			Instructions:  0,
+			NagFee:        0.5,
+			NodeID:        "",
+			Nonce:         "299", // Example value
+			OSignature:    "3046022100e35a304f202b2ee5b7bd639c0560409ef637d1cc560f59770a623da391274ace022100a5dd58f3b6ced7c68d858927a1dba719ee5e076aed998c2a1d4949c958055512",
+			Payload:       "simulated_hex_data",
+			ProcessingFee: 7.0,
+			ProtocolFee:   3.0,
+			Status:        "Executed", // Example value
+			Timestamp:     "2025:03:23-09:28:15", // Example value
+			To:            "your_wallet_address",
+			Type:          "C_TYPE_CERTIFICATE",
+		},
+		Node: "selected_node",
+	}
+	return resp, nil
+}
+
+// 17. GetTransactionByID searches for a specific transaction by its ID within a defined range.
+//
+// The txID parameter is the unique identifier of the transaction to search for.
+// The start parameter typically represents a starting point for the search, such as
+// a block ID or a timestamp string. In some API examples, this corresponds to a
+// "txBlock" or "block_id".
+// The end parameter represents an ending point for the search, similar to `start`.
+// If the `End` parameter is not relevant for a single transaction search by ID,
+// it might be left empty or represent a timestamp/block range for broader searches.
+// It returns a pointer to a TransactionResponse containing the transaction details, or an error.
+func (a *Account) GetTransactionByID(txID, start, end string) (*TransactionResponse, error) { //
+	// In a full implementation, this would query the blockchain explorer or API endpoint.
+	// The response structure is comprehensive based on "Expected Result" from source.
+	resp := &TransactionResponse{
+		Result: 200,
+		Response: struct {
+			BlockID       string  `json:"BlockID"`
+			BroadcastFee  float64 `json:"BroadcastFee"`
+			DeveloperFee  float64 `json:"DeveloperFee"`
+			From          string  `json:"From"`
+			GasLimit      float64 `json:"GasLimit"`
+			ID            string  `json:"ID"`
+			Instructions  int     `json:"Instructions"`
+			NagFee        float64 `json:"NagFee"`
+			NodeID        string  `json:"NodeID"`
+			Nonce         string  `json:"Nonce"`
+			OSignature    string  `json:"OSignature"`
+			Payload       string  `json:"Payload"`
+			ProcessingFee float64 `json:"ProcessingFee"`
+			ProtocolFee   float64 `json:"ProtocolFee"`
+			Status        string  `json:"Status"`
+			Timestamp     string  `json:"Timestamp"`
+			To            string  `json:"To"`
+			Type          string  `json:"Type"`
+		}{
+			BlockID:       start, // Using 'start' as BlockID for consistency with examples like (txBlock, txID)
+			BroadcastFee:  1.0,
+			DeveloperFee:  0.0,
+			From:          "your_wallet_address",
+			GasLimit:      0.0,
+			ID:            txID,
+			Instructions:  0,
+			NagFee:        0.5,
+			NodeID:        "",
+			Nonce:         "299", // Example value
+			OSignature:    "3046022100e35a304f202b2ee5b7bd639c05604099ef637d1cc560f59770a623da391274ace022100a5dd58f3b6ced7c68d858927a1dba719ee5e076aed998c2a1d4949c958055512",
+			Payload:       "your_hex_data",
+			ProcessingFee: 7.0,
+			ProtocolFee:   3.0,
+			Status:        "Executed", // Example value
+			Timestamp:     "2025:03:23-09:28:15", // Example value
+			To:            "your_wallet_address",
+			Type:          "C_TYPE_CERTIFICATE",
+		},
+		Node: "selected_node",
+	}
+	return resp, nil
+}
 -   **Future Enhancements**: After the MVP, consider expanding transaction monitoring capabilities (e.g., advanced querying, event subscriptions), adding support for more complex certificate types, and enhancing developer tooling based on community feedback.
 
 ## Logical Dependency Chain
