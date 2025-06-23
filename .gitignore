@@ -2,8 +2,11 @@
 
 .aider*
 .cursor/
+.cursorules/
 .roo/
+.roorules/
 .windsurf/
+.windsurfruules/
 .clinerules/
 .cline/
 .taskmaster/
