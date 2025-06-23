@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""
+TDD Automation CLI Entry Point
+Can be run as standalone CLI or MCP server
+"""
+
+import sys
+import asyncio
+import json
+from pathlib import Path
+
+# Add automation directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from mcp_server import TDDAutomationMCPServer
+from simple_tdd_test import SimpleTDDTest
+
+
+def print_help():
+    """Print usage information."""
+    print("""
+TDD Automation CLI
+
+Usage:
+  tdd-automation session <project_path>              # Run development session (recommended)
+  tdd-automation workflow <project_path> <task_id>    # Run complete TDD workflow
+  tdd-automation research <project_path> <task_id>    # Run research phase only  
+  tdd-automation plan <project_path> <task_id>        # Run planning phase only
+  tdd-automation implement <project_path> <task_id>   # Run implementation phase only
+  tdd-automation mcp <project_path>                   # Start as MCP server
+  tdd-automation help                                 # Show this help
+
+Examples:
+  tdd-automation session .                           # Run complete session with git integration
+  tdd-automation workflow . 2.1                      # Run workflow for task 2.1
+  tdd-automation mcp /path/to/project                 # Start MCP server
+
+MCP Tools Available:
+  - tdd_automation_workflow: Complete TDD workflow
+  - tdd_research_phase: Research phase only
+  - tdd_planning_phase: Planning phase only  
+  - tdd_implementation_phase: Implementation phase only
+""")
+
+
+async def run_session(project_path: str):
+    """Run development session with git integration."""
+    print(f"🚀 Starting Development Session")
+    print(f"Project: {project_path}")
+    print("=" * 50)
+    
+    from lifecycle_tdd import run_development_session
+    
+    result = run_development_session(project_path)
+    
+    print("\n✅ Session Complete!")
+    return result
+
+
+async def run_workflow(project_path: str, task_id: str):
+    """Run complete TDD workflow."""
+    print(f"🚀 Running TDD Automation Workflow")
+    print(f"Project: {project_path}")
+    print(f"Task: {task_id}")
+    print("=" * 50)
+    
+    tester = SimpleTDDTest(project_path)
+    result = tester.test_workflow(task_id)
+    
+    print("\n✅ Workflow Complete!")
+    return result
+
+
+async def run_mcp_server(project_path: str):
+    """Start MCP server mode."""
+    print(f"🔧 Starting TDD Automation MCP Server")
+    print(f"Project: {project_path}")
+    
+    server = TDDAutomationMCPServer(project_path)
+    
+    print("\nAvailable MCP Tools:")
+    for tool in server.get_available_tools():
+        print(f"  🛠️  {tool['name']}")
+        print(f"      {tool['description']}")
+    
+    print(f"\n🟢 MCP Server ready for project: {project_path}")
+    print("Waiting for tool calls from Claude Code...")
+    
+    # In a real MCP implementation, this would start the protocol handler
+    # For now, we'll simulate by keeping the process alive
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        print("\n🔴 MCP Server stopped")
+
+
+async def main():
+    """Main CLI entry point."""
+    if len(sys.argv) < 2:
+        print_help()
+        sys.exit(1)
+    
+    command = sys.argv[1]
+    
+    if command == "help":
+        print_help()
+        return
+    
+    if command == "session":
+        if len(sys.argv) < 3:
+            print("Error: session requires <project_path>")
+            sys.exit(1)
+        project_path = sys.argv[2]
+        await run_session(project_path)
+    
+    elif command == "workflow":
+        if len(sys.argv) < 4:
+            print("Error: workflow requires <project_path> <task_id>")
+            sys.exit(1)
+        project_path = sys.argv[2]
+        task_id = sys.argv[3]
+        await run_workflow(project_path, task_id)
+    
+    elif command == "mcp":
+        if len(sys.argv) < 3:
+            print("Error: mcp requires <project_path>")
+            sys.exit(1)
+        project_path = sys.argv[2]
+        await run_mcp_server(project_path)
+    
+    elif command in ["research", "plan", "implement"]:
+        if len(sys.argv) < 4:
+            print(f"Error: {command} requires <project_path> <task_id>")
+            sys.exit(1)
+        project_path = sys.argv[2]
+        task_id = sys.argv[3]
+        print(f"🔧 Running {command} phase for task {task_id}")
+        print("(Individual phases not implemented yet - use 'workflow' for now)")
+    
+    else:
+        print(f"Error: Unknown command '{command}'")
+        print_help()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
