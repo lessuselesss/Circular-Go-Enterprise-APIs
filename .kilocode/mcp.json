@@ -2,7 +2,11 @@
   "mcpServers": {
     "taskmaster-ai": {
       "command": "npx",
-      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+      "args": [
+        "-y",
+        "--package=task-master-ai",
+        "task-master-ai"
+      ],
       "env": {
         "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
         "PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE",
@@ -13,7 +17,28 @@
         "XAI_API_KEY": "YOUR_XAI_KEY_HERE",
         "AZURE_OPENAI_API_KEY": "YOUR_AZURE_KEY_HERE",
         "OLLAMA_API_KEY": "YOUR_OLLAMA_API_KEY_HERE"
-      }
+      },
+      "alwaysAllow": [
+        "analyze_project_complexity",
+        "next_task",
+        "get_tasks",
+        "get_task",
+        "set_task_status",
+        "use_tag"
+      ]
+    },
+    "git": {
+      "type": "stdio",
+      "command": "node",
+      "args": [],
+      "alwaysAllow": [
+        "git_checkout",
+        "git_fetch_origin",
+        "git_commit",
+        "git_add",
+        "git_status",
+        "git_create_branch"
+      ]
     }
   }
 }
