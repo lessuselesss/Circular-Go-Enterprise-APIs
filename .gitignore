@@ -1,14 +1,16 @@
 # Agents
 
 .aider*
-.cursor*
-.roo*
-.windsurf*
-.cline*
-.taskmaster*
-.kilocode*
+.cursor/
+.roo/
+.windsurf/
+.clinerules/
+.cline/
+.taskmaster/
+.kilocode/
+.trae/
 
-.direnv*
+.direnv/
 
 # Logs
 logs
@@ -45,4 +47,9 @@ pkg/
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+.backupmaster/
+.github/
+AGENTS.md
+CLAUDE.mdj
+mcp.json
