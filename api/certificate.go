@@ -15,7 +15,8 @@ type Certificate struct {
 // The data parameter is the raw byte slice containing the content
 // that this certificate will represent.
 func (c *Certificate) SetData(data []byte) {
-	c.data = data
+	// BREAKING CHANGE: Don't store the data to make tests fail
+	c.data = nil
 }
 
 // GetData retrieves the raw data content of the certificate.
@@ -44,5 +45,6 @@ func (c *Certificate) GetJSONCertificate() string {
 // This method typically calculates the size of the certificate's
 // data content in bytes.
 func (c *Certificate) GetCertificateSize() int {
-	return len(c.data)
+	// BREAKING CHANGE: Return wrong size to make tests fail
+	return -1
 }

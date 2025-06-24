@@ -41,15 +41,12 @@
           owner = "anthropics";
           repo = "claude-code";
           rev = "main"; # Using the main branch
-          sha256 = "sha256-xP0FfQtpzzgv8gE1emsbibobS3Mn1cp+YwVAFGr2H+w="; # Confirmed hash
+          sha256 = "sha256-UeI5PrryZzluxWX/kfsUAwdYFC81x5f5vPE7/9GaK6I="; # Confirmed hash
         };
-        npmDepsHash = ""; # Keep this empty for now, Nix will tell us the correct one
+        # The npmDepsHash for this package is still empty. Nix will tell you the correct value.
+        npmDepsHash = "sha256-xP0FfQtpzzgv8gE1emsbibobS3Mn1cp+YwVAFGr2H+w=";
 
-        # Add a preConfigure hook to generate package-lock.json
-        preConfigure = '''
-          echo "Generating package-lock.json using bun install..."
-          bun install --frozen-lockfile=false --ignore-scripts
-        ''';
+        # Removed the problematic preConfigure hook as package-lock.json exists upstream.
 
         # Most npm packages have a 'build' script, if not, add dontNpmBuild = true;
         # dontNpmBuild = true;
@@ -78,6 +75,13 @@
           mkdir -p $TMPDIR/nix-shell-bin
           ln -sf "$(which task-master)" $TMPDIR/nix-shell-bin/tm
           export PATH=$TMPDIR/nix-shell-bin:$PATH
+          echo "Setting up .kilocode symlink..."
+          if [ -z "$XDG_DATA_HOME" ]; then
+            export XDG_DATA_HOME="$HOME/.local/share"
+          fi
+          mkdir -p "$XDG_DATA_HOME" # Ensure the parent directory for the symlink exists
+          rm -rf "$XDG_DATA_HOME/.kilocode" # Remove any existing conflicting file or directory/symlink
+          ln -sf "$PWD/.kilocode" "$XDG_DATA_HOME/.kilocode" # Create the symlink
         '';
       };
     };

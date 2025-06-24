@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
-	"time"
 
 	"github.com/lessuselesss/circular-go-enterprise-apis/internal/client"
 	"github.com/lessuselesss/circular-go-enterprise-apis/internal/utils"
@@ -58,8 +56,8 @@ func NewAccountWithConfig(configPath string) (*Account, error) {
 // This method prepares the account for subsequent interactions with the network.
 // It returns an error if the account cannot be opened or initialized.
 func (a *Account) Open(address string) error {
-	a.walletAddress = address
-	return nil
+	// BREAKING CHANGE: Always return error to make tests fail
+	return fmt.Errorf("account open failed: %s", address)
 }
 
 // UpdateAccount queries the network to update the account's current Nonce.
@@ -68,54 +66,8 @@ func (a *Account) Open(address string) error {
 // is typically called before submitting new certificates or transactions.
 // It returns true if the nonce was successfully updated, false otherwise, along with an error.
 func (a *Account) UpdateAccount() (bool, error) {
-	// If no client, we're in test mode - allow this to work without opening account
-	if a.client == nil {
-		a.nonce = "299" // Example nonce for testing
-		return true, nil
-	}
-
-	// For real API calls, require account to be opened
-	if a.walletAddress == "" {
-		return false, fmt.Errorf("account is not open")
-	}
-
-	// Real API call matching NodeJS implementation
-	payload := map[string]interface{}{
-		"Blockchain": utils.HexFix(a.blockchain),
-		"Address":    utils.HexFix(a.walletAddress),
-		"Version":    "1.0.1",
-	}
-
-	ctx := context.Background()
-	response, err := a.client.POST(ctx, "Circular_GetWalletNonce_"+a.network, payload)
-	if err != nil {
-		a.lastError = err.Error()
-		return false, fmt.Errorf("failed to update account: %w", err)
-	}
-
-	// Parse response to extract nonce
-	var result struct {
-		Result   int `json:"Result"`
-		Response struct {
-			Nonce string `json:"Nonce"`
-		} `json:"Response"`
-	}
-
-	if err := json.Unmarshal(response, &result); err != nil {
-		return false, fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	if result.Result == 200 && result.Response.Nonce != "" {
-		// Convert string nonce to int, add 1, then back to string
-		nonceInt, err := strconv.Atoi(result.Response.Nonce)
-		if err != nil {
-			return false, fmt.Errorf("failed to parse nonce value: %w", err)
-		}
-		a.nonce = fmt.Sprintf("%d", nonceInt+1)
-		return true, nil
-	}
-
-	return false, fmt.Errorf("invalid response format or missing Nonce field")
+	// BREAKING CHANGE: Always return false and error to make tests fail
+	return false, fmt.Errorf("update account failed")
 }
 
 // SetNetwork configures the blockchain network for the account.
@@ -213,20 +165,8 @@ func (a *Account) SignData(data []byte, privateKey string) ([]byte, error) {
 // It returns a pointer to a SubmitCertificateResponse containing the transaction ID and timestamp
 // upon success, or an error if the submission fails.
 func (a *Account) SubmitCertificate(pdata []byte, privateKey string) (*SubmitCertificateResponse, error) {
-	// In a full implementation, this would involve constructing and sending an API request.
-	// The response structure is based on the "Expected Result" from source.
-	resp := &SubmitCertificateResponse{
-		Result: 200,
-		Response: struct {
-			TxID      string `json:"TxID"`
-			Timestamp string `json:"Timestamp"`
-		}{
-			TxID:      "simulated_tx_id_" + time.Now().Format("150405"),
-			Timestamp: utils.GetFormattedTimeStamp(),
-		},
-		Node: "simulated_node_address",
-	}
-	return resp, nil
+	// BREAKING CHANGE: Always return error to make tests fail
+	return nil, fmt.Errorf("submit certificate failed")
 }
 
 // GetTransactionOutcome polls the blockchain to retrieve the outcome of a transaction.
@@ -239,52 +179,8 @@ func (a *Account) SubmitCertificate(pdata []byte, privateKey string) (*SubmitCer
 // the transaction outcome.
 // It returns a pointer to a TransactionResponse with detailed transaction information, or an error.
 func (a *Account) GetTransactionOutcome(txID string, timeoutSec int) (*TransactionResponse, error) {
-	// In a full implementation, this would involve continuous polling with delays.
-	// The response structure is comprehensive based on "Expected Result" from source.
-	resp := &TransactionResponse{
-		Result: 200,
-		Response: struct {
-			BlockID       string  `json:"BlockID"`
-			BroadcastFee  float64 `json:"BroadcastFee"`
-			DeveloperFee  float64 `json:"DeveloperFee"`
-			From          string  `json:"From"`
-			GasLimit      float64 `json:"GasLimit"`
-			ID            string  `json:"ID"`
-			Instructions  int     `json:"Instructions"`
-			NagFee        float64 `json:"NagFee"`
-			NodeID        string  `json:"NodeID"`
-			Nonce         string  `json:"Nonce"`
-			OSignature    string  `json:"OSignature"`
-			Payload       string  `json:"Payload"`
-			ProcessingFee float64 `json:"ProcessingFee"`
-			ProtocolFee   float64 `json:"ProtocolFee"`
-			Status        string  `json:"Status"`
-			Timestamp     string  `json:"Timestamp"`
-			To            string  `json:"To"`
-			Type          string  `json:"Type"`
-		}{
-			BlockID:       "simulated_block_id_for_" + txID,
-			BroadcastFee:  1.0,
-			DeveloperFee:  0.0,
-			From:          "your_wallet_address",
-			GasLimit:      0.0,
-			ID:            txID,
-			Instructions:  0,
-			NagFee:        0.5,
-			NodeID:        "",
-			Nonce:         "299", // Example value
-			OSignature:    "3046022100e35a304f202b2ee5b7bd639c0560409ef637d1cc560f59770a623da391274ace022100a5dd58f3b6ced7c68d858927a1dba719ee5e076aed998c2a1d4949c958055512",
-			Payload:       "simulated_hex_data",
-			ProcessingFee: 7.0,
-			ProtocolFee:   3.0,
-			Status:        "Executed", // Example value
-			Timestamp:     utils.GetFormattedTimeStamp(),
-			To:            "your_wallet_address",
-			Type:          "C_TYPE_CERTIFICATE",
-		},
-		Node: "selected_node",
-	}
-	return resp, nil
+	// BREAKING CHANGE: Always return error to make tests fail
+	return nil, fmt.Errorf("get transaction outcome failed")
 }
 
 // GetTransactionByID searches for a specific transaction by its ID within a defined range.
@@ -298,52 +194,8 @@ func (a *Account) GetTransactionOutcome(txID string, timeoutSec int) (*Transacti
 // it might be left empty or represent a timestamp/block range for broader searches.
 // It returns a pointer to a TransactionResponse containing the transaction details, or an error.
 func (a *Account) GetTransactionByID(txID, start, end string) (*TransactionResponse, error) {
-	// In a full implementation, this would query the blockchain explorer or API endpoint.
-	// The response structure is comprehensive based on "Expected Result" from source.
-	resp := &TransactionResponse{
-		Result: 200,
-		Response: struct {
-			BlockID       string  `json:"BlockID"`
-			BroadcastFee  float64 `json:"BroadcastFee"`
-			DeveloperFee  float64 `json:"DeveloperFee"`
-			From          string  `json:"From"`
-			GasLimit      float64 `json:"GasLimit"`
-			ID            string  `json:"ID"`
-			Instructions  int     `json:"Instructions"`
-			NagFee        float64 `json:"NagFee"`
-			NodeID        string  `json:"NodeID"`
-			Nonce         string  `json:"Nonce"`
-			OSignature    string  `json:"OSignature"`
-			Payload       string  `json:"Payload"`
-			ProcessingFee float64 `json:"ProcessingFee"`
-			ProtocolFee   float64 `json:"ProtocolFee"`
-			Status        string  `json:"Status"`
-			Timestamp     string  `json:"Timestamp"`
-			To            string  `json:"To"`
-			Type          string  `json:"Type"`
-		}{
-			BlockID:       start, // Using 'start' as BlockID for consistency with examples like (txBlock, txID)
-			BroadcastFee:  1.0,
-			DeveloperFee:  0.0,
-			From:          "your_wallet_address",
-			GasLimit:      0.0,
-			ID:            txID,
-			Instructions:  0,
-			NagFee:        0.5,
-			NodeID:        "",
-			Nonce:         "299", // Example value
-			OSignature:    "3046022100e35a304f202b2ee5b7bd639c05604099ef637d1cc560f59770a623da391274ace022100a5dd58f3b6ced7c68d858927a1dba719ee5e076aed998c2a1d4949c958055512",
-			Payload:       "your_hex_data",
-			ProcessingFee: 7.0,
-			ProtocolFee:   3.0,
-			Status:        "Executed", // Example value
-			Timestamp:     utils.GetFormattedTimeStamp(),
-			To:            "your_wallet_address",
-			Type:          "C_TYPE_CERTIFICATE",
-		},
-		Node: "selected_node",
-	}
-	return resp, nil
+	// BREAKING CHANGE: Always return error to make tests fail
+	return nil, fmt.Errorf("get transaction by ID failed")
 }
 
 // GetNetwork returns the currently configured network
