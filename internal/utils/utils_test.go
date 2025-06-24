@@ -1,15 +1,15 @@
 package utils
 
 import (
+	"regexp"
 	"testing"
 	"time"
-	"regexp"
 )
 
 func TestGetFormattedTimeStamp(t *testing.T) {
 	// Test 1: Assert the correct format (YYYY:MM:DD-HH:MM:SS)
 	timestamp := GetFormattedTimeStamp()
-	pattern := `^\d{4}:\d{2}:\d{2}-\d{2}:\d{2}:\d{2}$`
+	pattern := `^\d{4}:\d{2}:\d{2}-\d{2}:\d{2}:\d{2}\.\d{3}$`
 	matched, err := regexp.MatchString(pattern, timestamp)
 	if err != nil {
 		t.Fatalf("Regex compilation error: %v", err)
@@ -19,7 +19,7 @@ func TestGetFormattedTimeStamp(t *testing.T) {
 	}
 
 	// Test 2: Assert the timestamp is approximately current UTC time
-	parsedTime, err := time.Parse("2006:01:02-15:04:05", timestamp)
+	parsedTime, err := time.Parse("2006:01:02-15:04:05.000", timestamp)
 	if err != nil {
 		t.Fatalf("Failed to parse timestamp '%s': %v", timestamp, err)
 	}
@@ -36,7 +36,7 @@ func TestGetFormattedTimeStampUniqueness(t *testing.T) {
 	timestamp1 := GetFormattedTimeStamp()
 	time.Sleep(1100 * time.Millisecond) // Sleep just over 1 second
 	timestamp2 := GetFormattedTimeStamp()
-	
+
 	if timestamp1 == timestamp2 {
 		t.Errorf("Expected different timestamps, but got same: %s", timestamp1)
 	}

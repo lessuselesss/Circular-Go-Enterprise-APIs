@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package api
 
 import (
@@ -66,7 +69,7 @@ func TestRealNetworkIntegration(t *testing.T) {
 
 	if response.Result == 200 {
 		t.Logf("Successfully submitted certificate! TxID: %s", response.Response.TxID)
-		
+
 		// Step 6: Monitor transaction outcome
 		txOutcome, err := account.GetTransactionOutcome(response.Response.TxID, 30)
 		if err != nil {
@@ -74,7 +77,7 @@ func TestRealNetworkIntegration(t *testing.T) {
 			return
 		}
 
-		t.Logf("Transaction outcome: Status=%s, BlockID=%s", 
+		t.Logf("Transaction outcome: Status=%s, BlockID=%s",
 			txOutcome.Response.Status, txOutcome.Response.BlockID)
 	}
 }

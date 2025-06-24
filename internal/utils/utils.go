@@ -10,7 +10,7 @@ import (
 // GetFormattedTimeStamp returns the current UTC time formatted as YYYY:MM:DD-HH:MM:SS.
 func GetFormattedTimeStamp() string {
 	now := time.Now().UTC()
-	return now.Format("2006:01:02-15:04:05") // Go's reference time for YYYY:MM:DD-HH:MM:SS
+	return now.Format("2006:01:02-15:04:05.000") // Go's reference time for YYYY:MM:DD-HH:MM:SS.000 (milliseconds)
 }
 
 // PadNumber adds a leading zero to numbers less than 10.

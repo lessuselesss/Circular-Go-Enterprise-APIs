@@ -50,10 +50,10 @@ pkg/
 .aider*
 
 # Task files
-# tasks.json
+# tasks.json 
 # tasks/
 .backupmaster/
 .github/
 AGENTS.md
 CLAUDE.mdj
-mcp.json
+mcp.jso
